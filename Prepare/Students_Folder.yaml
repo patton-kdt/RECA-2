@@ -1,0 +1,75 @@
+---
+- hosts: localhost
+  vars:
+    ansible_python_interpreter: /bin/python3
+    vcenter_hostname: "192.168.3.10"
+    vcenter_username: "administrator@vsphere.reca2"
+    vcenter_password: "VMware1!"
+    datacenter_name: "Datacenter"
+
+  tasks: 
+    - name: Create a Students folder
+      community.vmware.vcenter_folder:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: no
+        datacenter: '{{ datacenter_name }}'
+        folder_name: '{{ item }}'
+        parent_folder: "3.Students"
+        state: present
+      register: sub_folder_creation_result
+      loop:
+        - S00
+        - S01
+        - S02
+        - S03
+        - S04
+        - S05
+        - S06
+        - S07
+        - S08
+        - S09
+        - S10
+        - S11
+        - S12
+        - S13
+        - S14
+        - S15
+        - S16
+        - S17
+        - S18
+        - S19
+        - S20
+        - S21
+        - S22
+        - S23
+        - S24
+      delegate_to: localhost
+
+
+#changed: [localhost] => (item=S23) => {
+#    "ansible_loop_var": "item",
+#    "changed": true,
+#    "invocation": {
+#        "module_args": {
+#            "datacenter": "Datacenter",
+#            "folder_name": "S23",
+#            "folder_type": "vm",
+#            "hostname": "192.168.3.10",
+#            "parent_folder": "3.Students",
+#            "password": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
+#            "port": 443,
+#            "proxy_host": null,
+#            "proxy_port": null,
+#            "state": "present",
+#            "username": "administrator@vsphere.reca2",
+#            "validate_certs": false
+#        }
+#    },
+#    "item": "S23",
+#    "result": {
+#        "msg": "Folder 'S23' of type 'vm' under '3.Students' created successfully.",
+#        "path": "/Datacenter/vm/3.Students/S23"
+#    }
+#}
