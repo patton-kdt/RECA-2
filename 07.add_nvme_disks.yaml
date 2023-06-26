@@ -4,7 +4,7 @@
 
   tasks: 
     - name: Add NVMe Disks to  ESXi VMs
-      community.vmware.vmware_guest:
+      community.vmware.vmware_guest_disk:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
@@ -12,10 +12,6 @@
         datacenter: '{{datacenter_name}}'
         folder: '{{ folder_prefix + student_ID }}'
         name: '{{ item.vmname }}'
-        state: poweredoff
-        guest_id: vmkernel7Guest
-        esxi_hostname: "{{ esxi_hostname }}"
-        hardware:
         disk:
         - size_gb: 50
           controller_type: 'nvme'
