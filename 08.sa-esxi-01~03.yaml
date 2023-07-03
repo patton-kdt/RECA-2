@@ -20,6 +20,7 @@
       - "{{student_ID+'-SA-ESXi-01'}}"
       - "{{student_ID+'-SA-ESXi-02'}}"
       - "{{student_ID+'-SA-ESXi-03'}}"
+      - "{{student_ID+'-SA-ESXi-04'}}"
     delegate_to: localhost
 
 
@@ -36,7 +37,7 @@
       state: present
       force: yes
     with_nested:
-      - [ "{{student_ID+'-SA-ESXi-01'}}", "{{student_ID+'-SA-ESXi-02'}}", "{{student_ID+'-SA-ESXi-03'}}" ]
+      - [ "{{student_ID+'-SA-ESXi-01'}}", "{{student_ID+'-SA-ESXi-02'}}", "{{student_ID+'-SA-ESXi-03'}}", "{{student_ID+'-SA-ESXi-04'}}" ]
       - [ "Network adapter 1", "Network adapter 2" ]
     delegate_to: localhost
 
@@ -53,7 +54,7 @@
       state: present
       force: yes
     with_nested:
-      - [ "{{student_ID+'-SA-ESXi-01'}}", "{{student_ID+'-SA-ESXi-02'}}", "{{student_ID+'-SA-ESXi-03'}}" ]
+      - [ "{{student_ID+'-SA-ESXi-01'}}", "{{student_ID+'-SA-ESXi-02'}}", "{{student_ID+'-SA-ESXi-03'}}", "{{student_ID+'-SA-ESXi-04'}}" ]
       - [ "Network adapter 3", "Network adapter 4" ]
     delegate_to: localhost
 
@@ -72,6 +73,7 @@
       - "{{student_ID+'-SA-ESXi-01'}}"
       - "{{student_ID+'-SA-ESXi-02'}}"
       - "{{student_ID+'-SA-ESXi-03'}}"
+      - "{{student_ID+'-SA-ESXi-04'}}"
     delegate_to: localhost
   
   
@@ -116,6 +118,7 @@
     - { vm_name: "{{student_ID+'-SA-ESXi-01'}}", host_name: sa-esxi-01, ipaddr: 10.10.10.11 }
     - { vm_name: "{{student_ID+'-SA-ESXi-02'}}", host_name: sa-esxi-02, ipaddr: 10.10.10.12 }
     - { vm_name: "{{student_ID+'-SA-ESXi-03'}}", host_name: sa-esxi-03, ipaddr: 10.10.10.13 }
+    - { vm_name: "{{student_ID+'-SA-ESXi-04'}}", host_name: sa-esxi-04, ipaddr: 10.10.10.14 }
 #        esxcli network vswitch standard portgroup set -p 'Management Network' -v 10
 #        esxcli network vswitch standard portgroup set -p 'VM Network' -v 10
 
@@ -133,4 +136,5 @@
       - "{{student_ID+'-SA-ESXi-01'}}"
       - "{{student_ID+'-SA-ESXi-02'}}"
       - "{{student_ID+'-SA-ESXi-03'}}"
+      - "{{student_ID+'-SA-ESXi-04'}}"
     delegate_to: localhost
