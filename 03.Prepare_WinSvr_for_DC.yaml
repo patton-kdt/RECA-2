@@ -18,8 +18,6 @@
       esxi_hostname: '{{ esxi_hostname }}'
       datastore: "{{ datastore_name }}"
       template: "{{ dc_template_name }}"
-      linked_clone: True
-      snapshot_src: "{{ dc_snapshot_src_name }}"
       networks:
       - name: "{{ student_ID + '-SA-Mgmt' }}"
         label: "Network adapter 1"
@@ -28,7 +26,7 @@
         ip: 10.10.10.2
         netmask: 255.255.255.0
         gateway: 10.10.10.1
-        dns_servers: 192.168.3.2
+        dns_servers: 192.168.3.3
         type: static
       customization:
         password: VMware1!
