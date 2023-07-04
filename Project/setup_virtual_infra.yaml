@@ -138,7 +138,6 @@
       delegate_to: localhost
       register: shell_command_with_wait_timeout
 
-
     - name: Create a virtual machine on given ESXi hostname
       community.vmware.vmware_guest:
         hostname: "{{ vcenter_hostname }}"
@@ -163,7 +162,58 @@
         networks:
         - name: '{{ private_net }}'
           device_type: vmxnet3
+        cdrom:
+        - controller_number: 0
+          unit_number: 0
+          state: present
+          type: iso
+          iso_path: '{{ item.iso }}'
       with_items:
-      - { vmname: "{{ project_id + '-Storage'}}", guest_id: freebsd64Guest, cpus: 4, memory: 16384,  disk_gb: 32 }
+      - { vmname: "{{ project_id + '-Bastion'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-03]\ISO\rhel-8.5-x86_64-dvd.iso' }
+      - { vmname: "{{ project_id + '-Bootstrap'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-03]\ISO\rhel-8.5-x86_64-dvd.iso' }
+      - { vmname: "{{ project_id + '-Master-01'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-03]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
+      - { vmname: "{{ project_id + '-Master-02'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-03]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
+      - { vmname: "{{ project_id + '-Master-03'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-03]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
+      - { vmname: "{{ project_id + '-Worker-01'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: '[ESXi-03]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
+      - { vmname: "{{ project_id + '-Worker-02'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: '[ESXi-03]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
+      - { vmname: "{{ project_id + '-Worker-03'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: '[ESXi-03]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
+      - { vmname: "{{ project_id + '-Storage'}}", guest_id: freebsd64Guest, cpus: 4, memory: 16384,  disk_gb: 32, iso: '[ESXi-03]\ISO\TrueNAS-13.0-U4.iso' }
+      
       delegate_to: localhost
       register: deploy_vm
+
+    - name: Change & Modify Bastion VM Network
+      community.vmware.vmware_guest_network:
+        hostname: "{{ vcenter_hostname }}"
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: 'false'
+        name: "{{ project_id + '-Bastion'}}"
+        network_name: '{{ item.network }}'
+        label: '{{ item.label }}'
+        state: present
+      with_items:
+      - { network: "{{ public_net }}", label: "Network adapter 1" }
+      - { network: "{{ private_net }}", label: "Network adapter 2" }
+      delegate_to: localhost
+
+    - name: Add Bastion Disks
+      community.vmware.vmware_guest_disk:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: 'false'
+        datacenter: '{{datacenter_name}}'        
+        name: "{{ project_id + '-Bastion'}}"
+        disk:
+        - size_mb: 200
+          type: thin
+          datastore: '{{ datastore_name }}'
+          state: present
+          scsi_controller: 0
+          unit_number: 1
+          scsi_type: 'paravirtual'
+          disk_mode: 'persistent'
+      delegate_to: localhost
+      register: disk_facts
