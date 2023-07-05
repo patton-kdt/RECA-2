@@ -7,7 +7,7 @@
     vcenter_username: "s00@vclass.reca2"
     vcenter_password: "VMware1!"
     datacenter_name: "Datacenter"
-    folder_prefix: "/Datacenter/vm/4.Projects/"
+    parent_folder: "4.Projects"
     esxi_hostname: "esxi-01.vclass.reca2"
     esxi_password: "VMware1!"
     esxi_username: "root"
