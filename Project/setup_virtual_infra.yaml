@@ -234,13 +234,13 @@
           datastore: '{{ datastore_name }}'
           state: present
           scsi_controller: 0
-          unit_number: { item }
+          unit_number: '{{ item }}'
           scsi_type: 'paravirtual'
           disk_mode: 'persistent'
-        loop:
-          - '1'
-          - '2'
-          - '3'
-          - '4'
+      loop:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
       delegate_to: localhost
       register: disk_facts
