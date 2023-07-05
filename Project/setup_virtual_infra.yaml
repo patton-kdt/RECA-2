@@ -7,7 +7,7 @@
     vcenter_username: "s00@vclass.reca2"
     vcenter_password: "VMware1!"
     datacenter_name: "Datacenter"
-    parent_folder: "4.Projects\"
+    folder_prefix: "Datacenter/vm/4.Projects/"    
     esxi_hostname: "esxi-01.vclass.reca2"
     esxi_password: "VMware1!"
     esxi_username: "root"
@@ -24,7 +24,7 @@
         validate_certs: no
         datacenter: '{{ datacenter_name }}'
         folder_name: '{{ project_id }}'
-        parent_folder: '{{ parent_folder }}'
+        parent_folder: '{{ folder_prefix }}'
         state: present
       register: sub_folder_creation_result
       delegate_to: localhost
@@ -61,7 +61,7 @@
         password: '{{ vcenter_password }}'
         validate_certs: 'false'
         datacenter: '{{ datacenter_name }}'
-        folder: "{{ parent_folder + '\' project_id }}"
+        folder: "{{ folder_prefix + project_id }}"
         esxi_hostname: '{{ esxi_hostname }}'
         datastore: '{{ datastore_name }}'
         name: "{{ project_id + '-Router' }}"
