@@ -140,7 +140,7 @@
       delegate_to: localhost
       register: shell_command_with_wait_timeout
 
-    - name: Create a virtual machine on given ESXi hostname
+    - name: 09. Create a Project VMs (aka Barametal Machines) 
       community.vmware.vmware_guest:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -184,7 +184,7 @@
       delegate_to: localhost
       register: deploy_vm
 
-    - name: Change & Modify Bastion VM Network
+    - name: 10. Modify Bastion VM Network
       community.vmware.vmware_guest_network:
         hostname: "{{ vcenter_hostname }}"
         hostname: "{{ vcenter_hostname }}"
@@ -200,7 +200,7 @@
       - { network: "{{ private_net }}", label: "Network adapter 2" }
       delegate_to: localhost
 
-    - name: Add Bastion Disks
+    - name: 11. Add Disks to Bastion 
       community.vmware.vmware_guest_disk:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -217,5 +217,30 @@
           unit_number: 1
           scsi_type: 'paravirtual'
           disk_mode: 'persistent'
+      delegate_to: localhost
+      register: disk_facts
+
+    - name: 12. Add Disks to Storage (TruneNas)
+      community.vmware.vmware_guest_disk:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: 'false'
+        datacenter: '{{datacenter_name}}'        
+        name: "{{ project_id + '-Storage'}}"
+        disk:
+        - size_mb: 200
+          type: thin
+          datastore: '{{ datastore_name }}'
+          state: present
+          scsi_controller: 0
+          unit_number: { item }
+          scsi_type: 'paravirtual'
+          disk_mode: 'persistent'
+        loop:
+          - 1
+          - 2
+          - 3
+          - 4
       delegate_to: localhost
       register: disk_facts
