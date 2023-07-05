@@ -238,9 +238,9 @@
           scsi_type: 'paravirtual'
           disk_mode: 'persistent'
         loop:
-          - 1
-          - 2
-          - 3
-          - 4
+          - '1'
+          - '2'
+          - '3'
+          - '4'
       delegate_to: localhost
       register: disk_facts
