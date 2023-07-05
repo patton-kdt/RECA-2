@@ -2,6 +2,7 @@
 - hosts: localhost
   vars:
     ansible_python_interpreter: /bin/python3
+    gather_facts: no
     project_id: "Poject00"
     vcenter_hostname: "192.168.3.10"
     vcenter_username: "s00@vclass.reca2"
