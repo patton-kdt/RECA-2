@@ -16,7 +16,7 @@
     datastore_name: "ESXi-03"
 
   tasks: 
-    - name: Create a Project Team folder
+    - name: 01. Create a Project folder
       community.vmware.vcenter_folder:
         hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
@@ -29,7 +29,7 @@
       register: sub_folder_creation_result
       delegate_to: localhost
 
-    - name: Create Project Standard Switch
+    - name: 02. Create Project Standard vSwitch
       community.vmware.vmware_vswitch:
         hostname: '{{ esxi_hostname }}'
         username: '{{ esxi_username }}'
@@ -38,12 +38,12 @@
         switch: '{{ project_id }}'
       delegate_to: localhost
 
-    - name: Waiting 10 seconds for completing switch
+    - name: 03. Waiting 10 seconds for vSwitch creating
       wait_for:
         timeout: 10
       delegate_to: localhost
 
-    - name: Adding Private Portgroup
+    - name: 04. Adding Private Openshift Portgroup
       community.vmware.vmware_portgroup:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -54,7 +54,7 @@
         portgroup: "{{ private_net }}"
       delegate_to: localhost
 
-    - name: Deploy VyOS ova
+    - name: 05. Deploy VyOS ova
       community.vmware.vmware_deploy_ovf:
         hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
@@ -70,7 +70,7 @@
         ovf: /mnt/c/Material/temp-vyos-1.4.ova    
       delegate_to: localhost
 
-    - name: Power On Router VM
+    - name: 06. Power On Router VM
       community.vmware.vmware_guest_powerstate:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -81,12 +81,12 @@
         state: powered-on
       delegate_to: localhost
 
-    - name: Waiting 60 seconds for completing bootup
+    - name: 07. Waiting 60 seconds for Router bootup
       wait_for:
         timeout: 60
       delegate_to: localhost
 
-    - name: VyOS Router Configuration
+    - name: 08. VyOS Router Configuration
       community.vmware.vmware_vm_shell:
         hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
