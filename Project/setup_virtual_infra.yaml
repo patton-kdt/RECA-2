@@ -24,7 +24,7 @@
         validate_certs: no
         datacenter: '{{ datacenter_name }}'
         folder_name: '{{ project_id }}'
-        parent_folder: "Project"
+        parent_folder: '{{ folder_prefix }}'
         state: present
       register: sub_folder_creation_result
       delegate_to: localhost
