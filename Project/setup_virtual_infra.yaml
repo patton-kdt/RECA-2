@@ -61,7 +61,7 @@
         password: '{{ vcenter_password }}'
         validate_certs: 'false'
         datacenter: '{{ datacenter_name }}'
-        folder: "{{ folder_prefix + project_id }}"
+        folder: "{{ parent_folder + '\' project_id }}"
         esxi_hostname: '{{ esxi_hostname }}'
         datastore: '{{ datastore_name }}'
         name: "{{ project_id + '-Router' }}"
