@@ -13,7 +13,7 @@
     esxi_username: "root"
     public_net: "VM-192.168.3.x"
     private_net: "{{ project_id + '-Openshift' }}"
-    datastore_name: "ESXi-03"
+    datastore_name: "ESXi-01"
 
   tasks: 
     - name: 01. Create a Project folder
