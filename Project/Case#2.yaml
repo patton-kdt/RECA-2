@@ -56,35 +56,46 @@
         portgroup: "{{ private_net }}"
       delegate_to: localhost
 
-    - name: 05. Create a Router VM without Disk 
+    - name: 05. Create a Router VM with ISO file mount
       community.vmware.vmware_guest:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
         validate_certs: 'false'
+
         datacenter: '{{datacenter_name}}'
         folder: '{{ folder_prefix + project_id }}'
+        name: "{{ project_id + '-Router' }}"
 
-        name: '{{ item.vmname }}'
-        state: poweredon
-        guest_id: '{{ item.guest_id }}'
         esxi_hostname: "{{ esxi_hostname }}"
+        
+        datastore: '{{ datastore_name }}'
+
+        guest_id: "otherLinux64Guest"
+        
         hardware:
-          num_cpus: '{{ item.cpus }}'
-          memory_mb: '{{ item.memory }}'
+          num_cpus: "1"
+          memory_mb: "1024"
+          scsi: paravirtual
+
+        disk:
+        - size_gb: 10
+          type: thin
+          
         networks:
         - name: '{{ public_net }}'
           device_type: vmxnet3
         - name: '{{ private_net }}'
           device_type: vmxnet3
+          
         cdrom:
         - controller_number: 0
           unit_number: 0
           state: present
           type: iso
-          iso_path: '{{ item.iso }}'
-      with_items:
-      - { vmname: "{{ project_id + '-Router'}}", guest_id: otherLinux64Guest, cpus: 1, memory: 1024, iso: '[ESXi-05]\ISO\vyos-rolling-latest.iso' }
+          iso_path: "[ESXi-05]\ISO\vyos-rolling-latest.iso"
+          
+        state: poweredon
       delegate_to: localhost
       register: deploy_vm
 
