@@ -93,7 +93,7 @@
           unit_number: 0
           state: present
           type: iso
-          iso_path: "[ESXi-05]\ISO\vyos-rolling-latest.iso"
+          iso_path: '[ESXi-05]\ISO\vyos-rolling-latest.iso'
           
         state: poweredon
       delegate_to: localhost
