@@ -158,7 +158,7 @@
           state: present
           type: iso
           iso_path: '{{ item.iso }}'
-      with_items:
+      loop:
       - { vmname: "{{ project_id + '-Bastion'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-01]\ISO\rhel-8.5-x86_64-dvd.iso' }
       - { vmname: "{{ project_id + '-Bootstrap'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-01]\ISO\rhel-8.5-x86_64-dvd.iso' }
       - { vmname: "{{ project_id + '-Master-01'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: '[ESXi-01]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
@@ -168,7 +168,6 @@
       - { vmname: "{{ project_id + '-Worker-02'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: '[ESXi-01]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
       - { vmname: "{{ project_id + '-Worker-03'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: '[ESXi-01]\ISO\rhcos-412.86.202212081411-0-live.x86_64.iso' }
       - { vmname: "{{ project_id + '-Storage'}}", guest_id: freebsd64Guest, cpus: 4, memory: 16384,  disk_gb: 32, iso: '[ESXi-01]\ISO\TrueNAS-13.0-U4.iso' }
-      
       delegate_to: localhost
       register: deploy_vm
 
@@ -183,7 +182,7 @@
         network_name: '{{ item.network }}'
         label: '{{ item.label }}'
         state: present
-      with_items:
+      loop:
       - { network: "{{ public_net }}", label: "Network adapter 1" }
       - { network: "{{ private_net }}", label: "Network adapter 2" }
       delegate_to: localhost
@@ -197,7 +196,7 @@
         datacenter: '{{datacenter_name}}'        
         name: "{{ project_id + '-Bastion'}}"
         disk:
-        - size_mb: 200
+        - size_gb: 200
           type: thin
           datastore: '{{ datastore_name }}'
           state: present
@@ -217,7 +216,7 @@
         datacenter: '{{datacenter_name}}'        
         name: "{{ project_id + '-Storage'}}"
         disk:
-        - size_mb: 200
+        - size_gb: 200
           type: thin
           datastore: '{{ datastore_name }}'
           state: present
