@@ -68,27 +68,15 @@
         datastore: '{{ datastore_name }}'
         name: "{{ project_id + '-Router' }}"
         networks: { 'DPG-172.0.10.x': "{{ public_net }}", 'DPG-172.0.20.x': "{{ private_net }}" }
-        power_on: no
         ovf: /mnt/c/Material/temp-vyos-1.4.ova    
       delegate_to: localhost
 
-    - name: 06. Power On Router VM
-      community.vmware.vmware_guest_powerstate:
-        hostname: "{{ vcenter_hostname }}"
-        username: "{{ vcenter_username }}"
-        password: "{{ vcenter_password }}"
-        validate_certs: 'false'
-        folder: '{{ folder_prefix + project_id }}'
-        name: "{{ project_id + '-Router' }}"
-        state: powered-on
-      delegate_to: localhost
-
-    - name: 07. Waiting 60 seconds for Router bootup
+    - name: 06. Waiting 60 seconds for Router bootup
       wait_for:
         timeout: 60
       delegate_to: localhost
 
-    - name: 08. VyOS Router Configuration
+    - name: 07. VyOS Router Configuration
       community.vmware.vmware_vm_shell:
         hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
