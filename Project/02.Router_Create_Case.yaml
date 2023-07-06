@@ -1,0 +1,146 @@
+---
+- hosts: localhost
+  vars:
+    ansible_python_interpreter: /bin/python3
+    gather_facts: no
+    project_id: "PRT-00"
+    vcenter_hostname: "192.168.3.10"
+    vcenter_username: "s00@vclass.reca2"
+    vcenter_password: "VMware1!"
+    datacenter_name: "Datacenter"
+    parent_folder: "4.Projects"
+    folder_prefix: "/Datacenter/vm/4.Projects/"
+    esxi_hostname: "esxi-05.vclass.reca2"
+    esxi_password: "VMware1!"
+    esxi_username: "root"
+    public_net: "VM-192.168.3.x"
+    private_net: "{{ project_id + '-Openshift' }}"
+    datastore_name: "ESXi-05"
+
+  tasks: 
+    - name: 01. Create a Project folder
+      community.vmware.vcenter_folder:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: no
+        datacenter: '{{ datacenter_name }}'
+        folder_name: '{{ project_id }}'
+        parent_folder: '{{ parent_folder }}'
+        state: present
+      register: sub_folder_creation_result
+      delegate_to: localhost
+
+    - name: 02. Create Project Standard vSwitch
+      community.vmware.vmware_vswitch:
+        hostname: '{{ esxi_hostname }}'
+        username: '{{ esxi_username }}'
+        password: '{{ esxi_password }}'
+        validate_certs: no
+        switch: '{{ project_id }}'
+      delegate_to: localhost
+
+    - name: 03. Waiting 10 seconds for vSwitch creating
+      wait_for:
+        timeout: 10
+      delegate_to: localhost
+
+    - name: 04. Adding Private Openshift Portgroup
+      community.vmware.vmware_portgroup:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        esxi_hostname: "{{ esxi_hostname }}"
+        validate_certs: no
+        switch: "{{ project_id }}"
+        portgroup: "{{ private_net }}"
+      delegate_to: localhost
+
+    - name: 05. Create a Router VM without Disk 
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: 'false'
+        datacenter: '{{datacenter_name}}'
+        folder: '{{ folder_prefix + project_id }}'
+
+        name: '{{ item.vmname }}'
+        state: poweredon
+        guest_id: '{{ item.guest_id }}'
+        esxi_hostname: "{{ esxi_hostname }}"
+        hardware:
+          num_cpus: '{{ item.cpus }}'
+          memory_mb: '{{ item.memory }}'
+        networks:
+        - name: '{{ public_net }}'
+          device_type: vmxnet3
+        - name: '{{ private_net }}'
+          device_type: vmxnet3
+        cdrom:
+        - controller_number: 0
+          unit_number: 0
+          state: present
+          type: iso
+          iso_path: '{{ item.iso }}'
+      with_items:
+      - { vmname: "{{ project_id + '-Router'}}", guest_id: otherLinux64Guest, cpus: 1, memory: 1024, iso: '[ESXi-05]\ISO\vyos-rolling-latest.iso' }
+      delegate_to: localhost
+      register: deploy_vm
+
+    - name: 06. Waiting 60 seconds for Router bootup
+      wait_for:
+        timeout: 60
+      delegate_to: localhost
+
+    - name: 07. VyOS Router Configuration
+      community.vmware.vmware_vm_shell:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: 'false'
+        datacenter: '{{ datacenter_name }}'
+        folder: '{{ folder_prefix + project_id }}'
+        vm_id: "{{ project_id + '-Router' }}"
+        vm_id_type: vm_name
+        vm_username: 'vyos'
+        vm_password: 'vyos'
+        vm_shell: /bin/vbash
+        vm_shell_cwd: "/tmp"
+        vm_shell_args: |-
+          -c "source /opt/vyatta/etc/functions/script-template
+          configure
+          set system login user admin full-name Admin_User
+          set system login user admin authentication plaintext-password VMware1!
+          set service ssh port 22
+            
+          set system ipv6 disable
+          
+          set interfaces ethernet eth0 address dhcp
+          set interfaces ethernet eth0 description Outside
+          set interfaces ethernet eth0 ipv6 address no-default-link-local
+          set protocols static route 0.0.0.0/0 next-hop 192.168.3.1
+
+          set interfaces ethernet eth1 description 'Openshift Network'
+          set interfaces ethernet eth1 address 10.10.10.1/24
+          set interfaces ethernet eth0 ipv6 address no-default-link-local
+
+          set system name-server 192.168.3.3
+          set system ntp server kr.pool.ntp.org
+                      
+          set nat source rule 10 outbound-interface eth0
+          set nat source rule 10 source address 10.10.10.0/24
+          set nat source rule 10 translation address masquerade
+
+          set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 default-router '10.10.10.1'
+          set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 name-server '10.10.10.2'
+          set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 domain-name 'vclass.local'
+          set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 range 0 start '10.10.10.100'
+          set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 range 0 stop '10.10.10.200'
+           
+          commit
+          save"
+        wait_for_process: True
+        timeout: 180
+      delegate_to: localhost
+      register: shell_command_with_wait_timeout
