@@ -16,7 +16,7 @@
     parent_folder: "4.Projects"
     folder_prefix: "/Datacenter/vm/4.Projects/"
     datastore_name: "ESXi-05"              ## <-- 개인별 실습 서버의 저장소
-    iso_foler: "[ESXi-05]\ISO\"
+    iso_folder: '[ESXi-05]\ISO\'
 
   tasks: 
     - name: 09. Create a Project VMs (aka Barametal Machines) 
@@ -48,16 +48,16 @@
           unit_number: 0
           state: present
           type: iso
-          iso_path: '{{ item.iso }}'
+          iso_path: '{{ iso_folder + item.iso }}'
       loop:
-      - { vmname: "{{ project_id + '-Bastion'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: "{{ iso_folder + 'rhel-8.5-x86_64-dvd.iso'}}" }
-      - { vmname: "{{ project_id + '-Bootstrap'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: "{{ iso_folder + 'rhel-8.5-x86_64-dvd.iso'}}" }
-      - { vmname: "{{ project_id + '-Master-01'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: "{{ iso_folder +  'rhcos-4.12.17-x86_64-live.x86_64.iso'}}" }
-      - { vmname: "{{ project_id + '-Master-02'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: "{{ iso_folder +  'rhcos-4.12.17-x86_64-live.x86_64.iso'}}" }
-      - { vmname: "{{ project_id + '-Master-03'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: "{{ iso_folder +  'rhcos-4.12.17-x86_64-live.x86_64.iso'}}" }
-      - { vmname: "{{ project_id + '-Worker-01'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: "{{ iso_folder +  'rhcos-4.12.17-x86_64-live.x86_64.iso'}}" }
-      - { vmname: "{{ project_id + '-Worker-02'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: "{{ iso_folder +  'rhcos-4.12.17-x86_64-live.x86_64.iso'}}" }
-      - { vmname: "{{ project_id + '-Worker-03'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: "{{ iso_folder +  'rhcos-4.12.17-x86_64-live.x86_64.iso'}}" }
-      - { vmname: "{{ project_id + '-Storage'}}", guest_id: freebsd64Guest, cpus: 4, memory: 16384,  disk_gb: 32, iso: "{{ iso_folder +  'rhcos-4.12.17-x86_64-live.x86_64.iso'}}" }
+      - { vmname: "{{ project_id + '-Bastion'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: rhel-8.5-x86_64-dvd.iso }
+      - { vmname: "{{ project_id + '-Bootstrap'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: rhel-8.5-x86_64-dvd.iso }
+      - { vmname: "{{ project_id + '-Master-01'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: rhcos-4.12.17-x86_64-live.x86_64.iso }
+      - { vmname: "{{ project_id + '-Master-02'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: rhcos-4.12.17-x86_64-live.x86_64.iso }
+      - { vmname: "{{ project_id + '-Master-03'}}", guest_id: rhel8_64Guest, cpus: 4, memory: 16384, disk_gb: 120, iso: rhcos-4.12.17-x86_64-live.x86_64.iso }
+      - { vmname: "{{ project_id + '-Worker-01'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: rhcos-4.12.17-x86_64-live.x86_64.iso }
+      - { vmname: "{{ project_id + '-Worker-02'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: rhcos-4.12.17-x86_64-live.x86_64.iso }
+      - { vmname: "{{ project_id + '-Worker-03'}}", guest_id: rhel8_64Guest, cpus: 2, memory: 8192, disk_gb: 120, iso: rhcos-4.12.17-x86_64-live.x86_64.iso }
+      - { vmname: "{{ project_id + '-Storage'}}", guest_id: freebsd64Guest, cpus: 4, memory: 16384,  disk_gb: 32, iso: rhcos-4.12.17-x86_64-live.x86_64.iso }
       delegate_to: localhost
       register: deploy_vm
