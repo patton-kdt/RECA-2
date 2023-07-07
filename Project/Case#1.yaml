@@ -3,19 +3,19 @@
   vars:
     ansible_python_interpreter: /bin/python3
     gather_facts: no
-    project_id: "Poject00"
+    project_id: "PRJ-00"
     vcenter_hostname: "192.168.3.10"
     vcenter_username: "s00@vclass.reca2"
     vcenter_password: "VMware1!"
     datacenter_name: "Datacenter"
     parent_folder: "4.Projects"
     folder_prefix: "/Datacenter/vm/4.Projects/"
-    esxi_hostname: "esxi-01.vclass.reca2"
+    esxi_hostname: "esxi-05.vclass.reca2"
     esxi_password: "VMware1!"
     esxi_username: "root"
     public_net: "VM-192.168.3.x"
     private_net: "{{ project_id + '-Openshift' }}"
-    datastore_name: "ESXi-01"
+    datastore_name: "ESXi-05"
 
   tasks: 
     - name: 01. Create a Project folder
