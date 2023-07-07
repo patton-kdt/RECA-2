@@ -1,0 +1,100 @@
+---
+- hosts: localhost
+  vars:
+    ansible_python_interpreter: /bin/python3
+    gather_facts: no
+    project_id: "PRT-00"
+    vcenter_hostname: "192.168.3.10"
+    vcenter_username: "s00@vclass.reca2"
+    vcenter_password: "VMware1!"
+    datacenter_name: "Datacenter"
+    esxi_hostname: "esxi-05.vclass.reca2"
+    esxi_username: "root"
+    esxi_password: "VMware1!"
+    public_net:  "VM-192.168.3.x"
+    private_net: "{{ project_id + '-Openshift' }}"
+    parent_folder: "4.Projects"
+    folder_prefix: "/Datacenter/vm/4.Projects/"
+    datastore_name: "ESXi-05"
+
+tasks: 
+  - name: 01. Create a Project folder
+    community.vmware.vcenter_folder:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: false
+      datacenter_name: '{{ datacenter_name }}'
+      folder_name: '{{ project_id }}'
+#      parent_folder: "4.Projects"
+      parent_folder: '{{ parent_folder }}'
+      state: present
+    register: sub_folder_creation_result
+    delegate_to: localhost
+
+- name: 02. Create Project Standard vSwitch
+  community.vmware.vmware_vswitch:
+    hostname: '{{ esxi_hostname }}'
+    username: '{{ esxi_username }}'
+    password: '{{ esxi_password }}'
+    validate_certs: false
+    switch: '{{ project_id }}'
+  delegate_to: localhost
+
+- name: waiting vswitch creating
+  wait_for:
+    timeout: 10
+  delegate_to: localhost
+
+- name: 03. Adding Private Openshift Portgroup
+  community.vmware.vmware_portgroup:
+    validate_certs: false
+    hostname: "{{ esxi_hostname }}"
+    username: "{{ esxi_username }}"
+    password: "{{ esxi_password }}"
+    switch: "{{ project_id }}"
+    portgroup: "{{ private_net }}"
+  delegate_to: localhost
+
+- name: waiting vswitch creating
+  wait_for:
+    timeout: 5
+  delegate_to: localhost
+
+
+- name: 04. Create a Router VM with ISO file mount
+  community.vmware.vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: 'false'
+    datacenter: '{{datacenter_name}}'
+    folder: '{{ folder_prefix + project_id }}'
+    name: "{{ project_id + '-Router2' }}"
+    esxi_hostname: "{{ esxi_hostname }}"
+    datastore: '{{ datastore_name }}'
+    guest_id: "otherLinux64Guest"
+    hardware:
+      num_cpus: "1"
+      memory_mb: "1024"
+      scsi: paravirtual
+    networks:
+    - name: '{{ public_net }}'
+      device_type: vmxnet3
+    - name: '{{ private_net }}'
+      device_type: vmxnet3
+    cdrom:
+    - controller_number: 0
+      unit_number: 0
+      state: present
+      type: iso
+      iso_path: '[ESXi-05]\ISO\vyos-rolling-latest.iso'
+    state: poweredon
+  delegate_to: localhost
+  register: deploy_vm
+
+- name: waiting vswitch creating
+  wait_for:
+    timeout: 120
+  delegate_to: localhost
+
