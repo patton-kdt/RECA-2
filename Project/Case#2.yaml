@@ -3,19 +3,19 @@
   vars:
     ansible_python_interpreter: /bin/python3
     gather_facts: no
-    project_id: "PRT-00"
+    project_id: "PRT-00"                    ## <-- 개인별 프로젝트 ID값 사용 
     vcenter_hostname: "192.168.3.10"
-    vcenter_username: "s00@vclass.reca2"
+    vcenter_username: "s00@vclass.reca2"    ## <-- 개인별 vSphere 계정 사용
     vcenter_password: "VMware1!"
     datacenter_name: "Datacenter"
-    esxi_hostname: "esxi-05.vclass.reca2"
+    esxi_hostname: "esxi-05.vclass.reca2"  ## <-- 개인별 실습 물리서버 사용
     esxi_username: "root"
     esxi_password: "VMware1!"
     public_net:  "VM-192.168.3.x"
     private_net: "{{ project_id + '-Openshift' }}"
     parent_folder: "4.Projects"
     folder_prefix: "/Datacenter/vm/4.Projects/"
-    datastore_name: "ESXi-05"
+    datastore_name: "ESXi-05"              ## <-- 개인별 실습 서버의 저장소
 
   tasks: 
   - name: 01. Create a Project folder
