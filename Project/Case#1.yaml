@@ -16,7 +16,7 @@
     parent_folder: "4.Projects"
     folder_prefix: "/Datacenter/vm/4.Projects/"
     datastore_name: "ESXi-05"              ## <-- 개인별 실습 서버의 저장소
-    iso_folder: '[ESXi-05]\ISO\'
+    iso_folder: '[ESXi-05]\ISO\'           ## <-- 개인별 실습 서버의 ISO 폴더 경로
 
   tasks: 
     - name: 01. Create a Project folder
@@ -41,12 +41,12 @@
         switch: '{{ project_id }}'
       delegate_to: localhost
 
-    - name: 03. Waiting 10 seconds for vSwitch creating
+    - name: Waiting 10 seconds for vSwitch creating
       wait_for:
         timeout: 10
       delegate_to: localhost
 
-    - name: 04. Adding Private Openshift Portgroup
+    - name: 03. Adding Private Openshift Portgroup
       community.vmware.vmware_portgroup:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -57,7 +57,12 @@
         portgroup: "{{ private_net }}"
       delegate_to: localhost
 
-    - name: 05. Deploy VyOS ova
+    - name: Waiting 5 seconds for portgroup creating
+      wait_for:
+        timeout: 10
+      delegate_to: localhost
+
+    - name: 04. Deploy VyOS ova
       community.vmware.vmware_deploy_ovf:
         hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
@@ -72,12 +77,12 @@
         ovf: /mnt/c/Material/temp-vyos-1.4.ova    
       delegate_to: localhost
 
-    - name: 06. Waiting 60 seconds for Router bootup
+    - name: Waiting 60 seconds for Router bootup
       wait_for:
         timeout: 60
       delegate_to: localhost
 
-    - name: 07. VyOS Router Configuration
+    - name: 05. VyOS Router Configuration
       community.vmware.vmware_vm_shell:
         hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
@@ -96,39 +101,33 @@
           configure
           set system login user admin full-name Admin_User
           set system login user admin authentication plaintext-password VMware1!
-          set service ssh port 22
-            
-          set system ipv6 disable
-          
+          set service ssh port 22            
+          set system ipv6 disable          
           set interfaces ethernet eth0 address dhcp
           set interfaces ethernet eth0 description Outside
           set interfaces ethernet eth0 ipv6 address no-default-link-local
           set protocols static route 0.0.0.0/0 next-hop 192.168.3.1
-
           set interfaces ethernet eth1 description 'Openshift Network'
           set interfaces ethernet eth1 address 10.10.10.1/24
           set interfaces ethernet eth0 ipv6 address no-default-link-local
-
           set system name-server 192.168.3.3
-          set system ntp server kr.pool.ntp.org
-                      
+          set system ntp server kr.pool.ntp.org                      
           set nat source rule 10 outbound-interface eth0
           set nat source rule 10 source address 10.10.10.0/24
           set nat source rule 10 translation address masquerade
-
           set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 default-router '10.10.10.1'
           set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 name-server '10.10.10.2'
           set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 domain-name 'vclass.local'
           set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 range 0 start '10.10.10.100'
-          set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 range 0 stop '10.10.10.200'
-           
+          set service dhcp-server shared-network-name Openshift subnet 10.10.10.0/24 range 0 stop '10.10.10.200'           
           commit
           save"
         wait_for_process: True
         timeout: 180
       delegate_to: localhost
       register: shell_command_with_wait_timeout
-    - name: 09. Create a Project VMs (aka Barametal Machines) 
+      
+    - name: 06. Create a Project VMs (aka Barametal Machines) 
       community.vmware.vmware_guest:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -171,7 +170,7 @@
       delegate_to: localhost
       register: deploy_vm
 
-    - name: 10. Modify Bastion VM Network
+    - name: 07. Modify Bastion VM Network
       community.vmware.vmware_guest_network:
         hostname: "{{ vcenter_hostname }}"
         hostname: "{{ vcenter_hostname }}"
@@ -187,7 +186,7 @@
       - { network: "{{ private_net }}", label: "Network adapter 2" }
       delegate_to: localhost
 
-    - name: 11. Add Disks to Bastion 
+    - name: 08. Add Disks to Bastion 
       community.vmware.vmware_guest_disk:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -207,7 +206,7 @@
       delegate_to: localhost
       register: disk_facts
 
-    - name: 12. Add Disks to Storage (TruneNas)
+    - name: 09. Add Disks to Storage (TruneNas)
       community.vmware.vmware_guest_disk:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
