@@ -61,7 +61,7 @@
       timeout: 5
     delegate_to: localhost
 
-  - name: 04. Create a Router VM with ISO file mount
+  - name: 04. Create a Router VM with ISO file mount    ## Diskless의 Livecd를 이용해서 Router를 사용하는 시나리오
     community.vmware.vmware_guest:
       hostname: "{{ vcenter_hostname }}"
       username: "{{ vcenter_username }}"
