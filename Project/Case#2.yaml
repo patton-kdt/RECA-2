@@ -26,7 +26,6 @@
       validate_certs: false
       datacenter_name: '{{ datacenter_name }}'
       folder_name: '{{ project_id }}'
-#      parent_folder: "4.Projects"
       parent_folder: '{{ parent_folder }}'
       state: present
     register: sub_folder_creation_result
@@ -52,6 +51,7 @@
       hostname: "{{ esxi_hostname }}"
       username: "{{ esxi_username }}"
       password: "{{ esxi_password }}"
+      hosts: "{{ esxi_hostname }}"
       switch: "{{ project_id }}"
       portgroup: "{{ private_net }}"
     delegate_to: localhost
@@ -69,7 +69,7 @@
       validate_certs: 'false'
       datacenter: '{{datacenter_name}}'
       folder: '{{ folder_prefix + project_id }}'
-      name: "{{ project_id + '-Router2' }}"
+      name: "{{ project_id + '-Router' }}"
       esxi_hostname: "{{ esxi_hostname }}"
       datastore: '{{ datastore_name }}'
       guest_id: "otherLinux64Guest"
