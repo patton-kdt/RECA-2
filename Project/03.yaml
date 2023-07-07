@@ -29,7 +29,7 @@
         folder: '{{ folder_prefix + project_id }}'
 
         name: '{{ project_id + item.vmname }}'
-        state: poweredon
+        state: poweredoff
         guest_id: '{{ item.guest_id }}'
         esxi_hostname: "{{ esxi_hostname }}"
         hardware:
