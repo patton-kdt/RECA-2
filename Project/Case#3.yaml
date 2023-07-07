@@ -17,7 +17,7 @@
     folder_prefix: "/Datacenter/vm/4.Projects/"
     datastore_name: "ESXi-05"
 
-tasks: 
+  tasks: 
   - name: 01. Create a Project folder
     community.vmware.vcenter_folder:
       hostname: '{{ vcenter_hostname }}'
