@@ -191,7 +191,6 @@
   - name: 7. Modify Bastion VM Network
     community.vmware.vmware_guest_network:
       hostname: "{{ vcenter_hostname }}"
-      hostname: "{{ vcenter_hostname }}"
       username: "{{ vcenter_username }}"
       password: "{{ vcenter_password }}"
       validate_certs: 'false'
